@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: product-app
+data:
+  database_url: jdbc:postgresql://database-service:5432/productdb

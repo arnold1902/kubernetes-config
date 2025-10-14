@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-deployment
+  namespace: product-app
+  labels:
+    app: postgres-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-database
+  template:
+    metadata:
+      labels:
+        app: postgres-database
+    spec:
+      automountServiceAccountToken: false
+      containers:
+          - name: postgres-db
+            image: postgres:15-alpine3.21
+            ports:
+              - containerPort: 5432
+            resources:
+              requests:
+                cpu: "250m"
+                memory: "256Mi"
+                ephemeral-storage: "500Mi"
+              limits:
+                memory: "512Mi"
+                ephemeral-storage: "1Gi"
+            env:
+              - name: POSTGRES_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: db-credentials
+                    key: username
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: db-credentials
+                    key: password
+              - name: POSTGRES_DB
+                value: productdb
+            volumeMounts:
+              - name: postgres-storage
+                mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
