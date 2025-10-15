@@ -4,7 +4,7 @@ metadata:
   name: redis-deployment
   namespace: product-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: redis-deployment
@@ -15,10 +15,14 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-        - name: redis
-          image: redis:alpine3.22
+        - name: redis-stack
+          image: redis/redis-stack:7.2.0-v19
           ports:
             - containerPort: 6379
+            - containerPort: 8001
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
           resources:
             requests:
               cpu: "100m"
@@ -27,3 +31,7 @@ spec:
             limits:
               memory: "256Mi"
               ephemeral-storage: "512Mi"
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-stack-pvc

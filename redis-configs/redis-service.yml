@@ -12,4 +12,11 @@ spec:
     - protocol: TCP
       port: 6379
       targetPort: 6379
+      nodePort: 30001
+      name: redis
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001
+      nodePort: 30003
+      name: redisinsight
   type: NodePort
