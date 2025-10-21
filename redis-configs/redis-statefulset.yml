@@ -1,17 +1,18 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: redis-deployment
+  name: redis-statefulset
   namespace: product-app
 spec:
+  serviceName: redis-service
   replicas: 1
   selector:
     matchLabels:
-      app: redis-deployment
+      app: redis-statefulset
   template:
     metadata:
       labels:
-        app: redis-deployment
+        app: redis-statefulset
     spec:
       automountServiceAccountToken: false
       containers:
@@ -31,7 +32,12 @@ spec:
             limits:
               memory: "256Mi"
               ephemeral-storage: "512Mi"
-      volumes:
-        - name: redis-data
-          persistentVolumeClaim:
-            claimName: redis-stack-pvc
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 5Gi
