@@ -71,6 +71,29 @@ spec:
             limits:
               memory: "2Gi"
               ephemeral-storage: "4Gi"
+        - name: schema-registry
+          image: confluentinc/cp-schema-registry:7.4.0
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SCHEMA_REGISTRY_HOST_NAME
+              value: "schema-registry"
+            - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
+              value: "localhost:9092"
+            - name: SCHEMA_REGISTRY_KAFKASTORE_TOPIC
+              value: "_schemas"
+          volumeMounts:
+            - name: schema-registry-data
+              mountPath: /var/lib/schema-registry
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "500Mi"
+              ephemeral-storage: "1Gi"
+            limits:
+              memory: "1Gi"
+              ephemeral-storage: "2Gi"
+          
   volumeClaimTemplates:
   - metadata:
       name: zookeeper-data
@@ -95,5 +118,13 @@ spec:
       storageClassName: "standard"
       resources:
         requests:
-          storage: 10Gi
+          storage: 5Gi
+  - metadata:
+      name: schema-registry-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 1Gi
 
